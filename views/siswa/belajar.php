@@ -20,7 +20,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'tandai_selesai') {
         $id = $_POST['item_id'] ?? 0;
-        $db->execute("INSERT IGNORE INTO progress_materi (item_id, siswa_id) VALUES (?, ?)", 'ii', [$id, $user_id]);
+        
+        $cek_prog = $db->queryOne("SELECT id FROM progress_materi WHERE item_id=? AND siswa_id=?", 'ii', [$id, $user_id]);
+        if (!$cek_prog) {
+            $db->execute("INSERT IGNORE INTO progress_materi (item_id, siswa_id) VALUES (?, ?)", 'ii', [$id, $user_id]);
+            
+            $item_info = $db->queryOne("SELECT tipe, judul FROM modul_item WHERE id=?", 'i', [$id]);
+            $keterangan = ($item_info && $item_info['tipe'] === 'live_class') ? 'Menghadiri Live Class' : 'Menyelesaikan materi bacaan';
+            
+            $hasil = Gamifikasi::tambahXP($user_id, Gamifikasi::XP_MATERI_SELESAI, $keterangan);
+            if (!empty($hasil['badge_baru'])) {
+                $_SESSION['badge_baru'] = $hasil['badge_baru'];
+            }
+            setFlash('success', 'Berhasil menyelesaikan materi! +' . Gamifikasi::XP_MATERI_SELESAI . ' XP 🎉');
+        }
         
         // Cari item berikutnya
         $curr = $db->queryOne("SELECT m.urutan as m_urut, mi.urutan as i_urut FROM modul_item mi JOIN modul m ON m.id=mi.modul_id WHERE mi.id=?", 'i', [$id]);
@@ -69,10 +82,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
+        // Cek apakah sudah pernah kuis
+        $cek_kuis = $db->queryOne("SELECT skor FROM kuis_hasil WHERE item_id=? AND siswa_id=?", 'ii', [$id, $user_id]);
+        $sudah_pernah = $cek_kuis ? true : false;
+        
         // Simpan total sementara (hanya dari PG) ke kuis_hasil
         $db->execute("INSERT INTO kuis_hasil (item_id, siswa_id, skor) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE skor=VALUES(skor), diselesaikan_pada=NOW()", 'iid', [$id, $user_id, $total_pg_didapat]);
         
-        setFlash('success', "Kuis selesai! Poin Pilihan Ganda Anda: " . round($total_pg_didapat) . ". (Poin Essay menunggu penilaian guru)");
+        $msg_tambahan = "";
+        if (!$sudah_pernah) {
+            $xp_didapat = Gamifikasi::XP_KUIS_SELESAI;
+            $keterangan = 'Menyelesaikan kuis';
+            
+            $total_maks = 0;
+            foreach ($soalList as $s) {
+                 $total_maks += $s['poin_maksimal'];
+            }
+            if ($total_maks > 0 && $total_pg_didapat >= $total_maks) {
+                 $xp_didapat += Gamifikasi::XP_KUIS_SEMPURNA;
+                 $keterangan = 'Menyelesaikan kuis dengan skor sempurna';
+            }
+            
+            $hasil = Gamifikasi::tambahXP($user_id, $xp_didapat, $keterangan);
+            if (!empty($hasil['badge_baru'])) {
+                $_SESSION['badge_baru'] = $hasil['badge_baru'];
+            }
+            $msg_tambahan = " (+" . $xp_didapat . " XP 🎉)";
+        }
+        
+        setFlash('success', "Kuis selesai! Poin PG Anda: " . round($total_pg_didapat) . $msg_tambahan);
         header("Location: " . BASE_URL . "/index.php?page=s_belajar&jm_id=$jm_id&item_id=$id");
         exit;
     }

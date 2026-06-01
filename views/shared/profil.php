@@ -38,6 +38,11 @@ ob_start();
         </div>
         
         <div class="form-group">
+            <label>Nomor WhatsApp <small class="text-muted">(Contoh: 081234567890)</small></label>
+            <input type="text" name="no_hp" class="form-control" value="<?= e($user['no_hp'] ?? '') ?>" placeholder="08...">
+        </div>
+        
+        <div class="form-group">
             <label>Password Baru <small class="text-muted">(Kosongkan jika tidak ingin mengubah)</small></label>
             <input type="password" name="password_baru" class="form-control" placeholder="******">
         </div>

@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $nama = trim($_POST['nama'] ?? '');
+    $no_hp = trim($_POST['no_hp'] ?? '');
     $password_baru = $_POST['password_baru'] ?? '';
     $user_id = $_SESSION['user_id'];
     
@@ -23,9 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $updateQuery = "UPDATE users SET nama=?";
-    $params = [$nama];
-    $types = 's';
+    $updateQuery = "UPDATE users SET nama=?, no_hp=?";
+    $params = [$nama, $no_hp];
+    $types = 'ss';
     
     if ($password_baru) {
         $updateQuery .= ", password=?";

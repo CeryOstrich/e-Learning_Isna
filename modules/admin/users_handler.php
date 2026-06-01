@@ -16,6 +16,7 @@ switch ($action) {
         verifyCsrf();
         $nama    = trim($_POST['nama']    ?? '');
         $nis_nip = trim($_POST['nis_nip'] ?? '');
+        $no_hp   = trim($_POST['no_hp'] ?? '');
         $pass    = $_POST['password']     ?? '';
         $role    = $_POST['role']         ?? 'siswa';
 
@@ -38,8 +39,8 @@ switch ($action) {
 
         $hash = password_hash($pass, PASSWORD_BCRYPT, ['cost' => 12]);
         $db->execute(
-            "INSERT INTO users (nama, nis_nip, password, role) VALUES (?,?,?,?)",
-            'ssss', [$nama, $nis_nip, $hash, $role]
+            "INSERT INTO users (nama, nis_nip, no_hp, password, role) VALUES (?,?,?,?,?)",
+            'sssss', [$nama, $nis_nip, $no_hp, $hash, $role]
         );
 
         setFlash('success', "User '$nama' berhasil ditambahkan.");
@@ -52,6 +53,7 @@ switch ($action) {
         $id      = (int)($_POST['id']     ?? 0);
         $nama    = trim($_POST['nama']    ?? '');
         $nis_nip = trim($_POST['nis_nip'] ?? '');
+        $no_hp   = trim($_POST['no_hp'] ?? '');
         $role    = $_POST['role']         ?? 'siswa';
         $pass    = $_POST['password']     ?? '';
 
@@ -70,13 +72,13 @@ switch ($action) {
         if (!empty($pass)) {
             $hash = password_hash($pass, PASSWORD_BCRYPT, ['cost' => 12]);
             $db->execute(
-                "UPDATE users SET nama=?, nis_nip=?, role=?, password=? WHERE id=?",
-                'ssssi', [$nama, $nis_nip, $role, $hash, $id]
+                "UPDATE users SET nama=?, nis_nip=?, no_hp=?, role=?, password=? WHERE id=?",
+                'sssssi', [$nama, $nis_nip, $no_hp, $role, $hash, $id]
             );
         } else {
             $db->execute(
-                "UPDATE users SET nama=?, nis_nip=?, role=? WHERE id=?",
-                'sssi', [$nama, $nis_nip, $role, $id]
+                "UPDATE users SET nama=?, nis_nip=?, no_hp=?, role=? WHERE id=?",
+                'ssssi', [$nama, $nis_nip, $no_hp, $role, $id]
             );
         }
 

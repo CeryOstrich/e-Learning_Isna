@@ -66,7 +66,7 @@ ob_start();
         <table>
             <thead>
                 <tr>
-                    <th>#</th><th>Nama</th><th>NIS/NIP</th>
+                    <th>#</th><th>Nama</th><th>NIS/NIP</th><th>No. WhatsApp</th>
                     <th>Role</th><th>Gamifikasi</th><th>Status</th><th>Aksi</th>
                 </tr>
             </thead>
@@ -90,6 +90,7 @@ ob_start();
                     </div>
                 </td>
                 <td><?= e($u['nis_nip'] ?? '—') ?></td>
+                <td><?= e($u['no_hp'] ?? '—') ?></td>
                 <td>
                     <span class="badge badge-<?= $u['role']==='admin' ? 'danger' : ($u['role']==='guru' ? 'success' : 'info') ?>">
                         <?= ucfirst(e($u['role'])) ?>
@@ -150,6 +151,10 @@ ob_start();
                 <input type="text" name="nis_nip" class="form-control" required placeholder="Contoh: 1234 atau 198001012010011001">
             </div>
             <div class="form-group">
+                <label>Nomor WhatsApp</label>
+                <input type="text" name="no_hp" class="form-control" placeholder="Contoh: 081234567890">
+            </div>
+            <div class="form-group">
                 <label>Password *</label>
                 <input type="password" name="password" class="form-control" required minlength="8" placeholder="Min. 8 karakter">
             </div>
@@ -187,6 +192,10 @@ ob_start();
                 <input type="text" name="nis_nip" id="edit-nis_nip" class="form-control" required>
             </div>
             <div class="form-group">
+                <label>Nomor WhatsApp</label>
+                <input type="text" name="no_hp" id="edit-no_hp" class="form-control" placeholder="Contoh: 081234567890">
+            </div>
+            <div class="form-group">
                 <label>Password Baru <small style="color:var(--text-muted);">(kosongkan jika tidak diganti)</small></label>
                 <input type="password" name="password" class="form-control" minlength="8">
             </div>
@@ -217,6 +226,7 @@ function editUser(u) {
     document.getElementById('edit-id').value      = u.id;
     document.getElementById('edit-nama').value    = u.nama;
     document.getElementById('edit-nis_nip').value = u.nis_nip || '';
+    document.getElementById('edit-no_hp').value   = u.no_hp || '';
     document.getElementById('edit-role').value    = u.role;
     showModal('modal-edit-user');
 }

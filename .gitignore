@@ -1,0 +1,11 @@
+/vendor/
+/node_modules/
+.env
+/uploads/
+*.rar
+*.zip
+*.sql
+*.log
+*.sqlite
+.DS_Store
+Thumbs.db

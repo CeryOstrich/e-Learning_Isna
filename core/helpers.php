@@ -160,3 +160,45 @@ function verifyCsrf(): void
     // Regenerate token setelah terpakai
     unset($_SESSION['csrf_token']);
 }
+
+/**
+ * Kirim pesan WhatsApp menggunakan API Fonnte.
+ * @param string $target Nomor HP tujuan (bisa dipisah koma untuk bulk)
+ * @param string $message Isi pesan WhatsApp
+ * @param string $delay Jeda pengiriman (dalam detik) untuk mencegah blokir. Default: "2"
+ * @return mixed Response dari cURL Fonnte
+ */
+function sendFonnteWhatsApp(string $target, string $message, string $delay = "2")
+{
+    if (!defined('FONNTE_TOKEN') || FONNTE_TOKEN === 'MASUKKAN_TOKEN_ANDA_DISINI') {
+        return false; // Token belum di-set
+    }
+
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => 'https://api.fonnte.com/send',
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_ENCODING => '',
+      CURLOPT_MAXREDIRS => 10,
+      CURLOPT_TIMEOUT => 0,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST => 'POST',
+      CURLOPT_POSTFIELDS => array(
+        'target' => $target,
+        'message' => $message, 
+        'delay' => $delay
+      ),
+      CURLOPT_HTTPHEADER => array(
+        'Authorization: ' . FONNTE_TOKEN
+      ),
+      // Buka proteksi SSL lokal agar berfungsi baik di localhost/Laragon
+      CURLOPT_SSL_VERIFYPEER => false,
+      CURLOPT_SSL_VERIFYHOST => false,
+    ));
+
+    $response = curl_exec($curl);
+    curl_close($curl);
+    return $response;
+}

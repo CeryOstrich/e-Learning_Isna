@@ -30,17 +30,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Create notification for targeted users
             $users = [];
             if ($target === 'semua') {
-                $users = $db->queryAll("SELECT id FROM users WHERE is_active=1 AND id != ?", 'i', [$user_id]);
+                $users = $db->queryAll("SELECT id, no_hp FROM users WHERE is_active=1 AND id != ?", 'i', [$user_id]);
             } else {
-                $users = $db->queryAll("SELECT id FROM users WHERE is_active=1 AND role=?", 's', [$target]);
+                $users = $db->queryAll("SELECT id, no_hp FROM users WHERE is_active=1 AND role=?", 's', [$target]);
             }
             
+            $wa_targets = [];
             foreach ($users as $u) {
                 $db->execute("INSERT INTO notifikasi (user_id, pesan, link) VALUES (?, ?, ?)", 'iss', [
                     $u['id'],
                     "Pengumuman Baru: " . $judul,
                     "?page=dashboard"
                 ]);
+                
+                // Kumpulkan nomor WA yang valid
+                if (!empty($u['no_hp']) && strlen($u['no_hp']) >= 10) {
+                    $wa_targets[] = $u['no_hp'];
+                }
+            }
+            
+            // Kirim pesan WhatsApp massal jika ada target
+            if (!empty($wa_targets)) {
+                $wa_message = "*PENGUMUMAN BARU*\n\n" . 
+                              "*" . $judul . "*\n\n" . 
+                              strip_tags($isi) . "\n\n" . 
+                              "_Pesan otomatis dari E-Learning MTs_";
+                
+                // Gabungkan semua nomor dengan koma
+                $targetString = implode(',', $wa_targets);
+                
+                // Kirim via Fonnte dengan delay 2 detik per pesan agar tidak diban
+                sendFonnteWhatsApp($targetString, $wa_message, "2");
             }
             
             setFlash('success', 'Pengumuman berhasil disiarkan.');
