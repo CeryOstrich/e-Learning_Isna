@@ -1,0 +1,50 @@
+# ============================================================
+# .htaccess — E-Learning MTs (Production Config)
+# ============================================================
+
+# --- 1. Matikan directory listing ---
+Options -Indexes
+
+# --- 2. Blokir akses langsung ke file sensitif ---
+<FilesMatch "\.(sql|env|log|sh|bak|gitignore)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Blokir akses ke seluruh folder config & core secara langsung
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /WEBSITE-SKRIPSI-ISNA/
+    # CATATAN: Jika di VPS root domain, ubah RewriteBase menjadi: /
+
+    # Blokir akses langsung ke folder inti
+    RewriteRule ^config/ - [F,L]
+    RewriteRule ^core/ - [F,L]
+    RewriteRule ^modules/ - [F,L]
+    RewriteRule ^views/ - [F,L]
+
+    # Jika file/folder asli ada, layani langsung (untuk assets, dll)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Semua request yang tidak cocok → arahkan ke index.php (Front Controller)
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+# --- 3. Keamanan header HTTP ---
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# --- 4. Sembunyikan versi PHP dari respons server ---
+<IfModule mod_php.c>
+    php_flag expose_php Off
+    php_flag display_errors Off
+    php_flag log_errors On
+</IfModule>
+
+# --- 5. Charset default ---
+AddDefaultCharset UTF-8

@@ -1,0 +1,70 @@
+# ============================================================
+# PANDUAN KONFIGURASI NGINX (Jika VPS menggunakan Nginx, bukan Apache)
+#
+# Salin konfigurasi di bawah ini ke file Virtual Host Nginx Anda.
+# Biasanya berada di: /etc/nginx/sites-available/elearning-mts.com
+# ============================================================
+
+# server {
+#     listen 80;
+#     server_name elearning-mts.com www.elearning-mts.com;
+#     return 301 https://$host$request_uri;  # Redirect ke HTTPS
+# }
+#
+# server {
+#     listen 443 ssl;
+#     server_name elearning-mts.com www.elearning-mts.com;
+#
+#     # SSL Certificate (Let's Encrypt)
+#     ssl_certificate     /etc/letsencrypt/live/elearning-mts.com/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/elearning-mts.com/privkey.pem;
+#
+#     root /var/www/html/elearning-mts;  # Sesuaikan dengan path VPS Anda
+#     index index.php;
+#
+#     # Matikan directory listing
+#     autoindex off;
+#
+#     # Arahkan semua request ke index.php (Front Controller)
+#     location / {
+#         try_files $uri $uri/ /index.php?$query_string;
+#     }
+#
+#     # Jalankan PHP via PHP-FPM
+#     location ~ \.php$ {
+#         fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+#         fastcgi_index index.php;
+#         include fastcgi_params;
+#         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+#     }
+#
+#     # Blokir akses ke folder sensitif
+#     location ~* ^/(config|core|modules|views)/ {
+#         deny all;
+#         return 403;
+#     }
+#
+#     # Blokir file sensitif
+#     location ~* \.(sql|env|log|sh|bak|git)$ {
+#         deny all;
+#         return 403;
+#     }
+#
+#     # Blokir eksekusi PHP di folder uploads (keamanan web shell)
+#     location ~* /uploads/.*\.php$ {
+#         deny all;
+#         return 403;
+#     }
+#
+#     # Cache aset statis
+#     location ~* \.(css|js|jpg|jpeg|png|webp|gif|ico|woff|woff2)$ {
+#         expires 30d;
+#         add_header Cache-Control "public, no-transform";
+#     }
+#
+#     # Security headers
+#     add_header X-Content-Type-Options "nosniff";
+#     add_header X-Frame-Options "SAMEORIGIN";
+#     add_header X-XSS-Protection "1; mode=block";
+#     add_header Referrer-Policy "strict-origin-when-cross-origin";
+# }

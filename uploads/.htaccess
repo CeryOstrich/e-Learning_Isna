@@ -1,1 +1,25 @@
-Deny from all
+# ============================================================
+# uploads/.htaccess — Blokir eksekusi script di folder upload
+# ============================================================
+
+# Matikan directory listing
+Options -Indexes
+
+# Izinkan akses ke file gambar & dokumen, tapi blokir eksekusi PHP/script
+<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|cgi|sh|shtml|asp|aspx|jsp)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Nonaktifkan PHP engine di folder ini (double protection)
+<IfModule mod_php.c>
+    php_flag engine Off
+</IfModule>
+
+<IfModule mod_php7.c>
+    php_flag engine Off
+</IfModule>
+
+<IfModule mod_php8.c>
+    php_flag engine Off
+</IfModule>

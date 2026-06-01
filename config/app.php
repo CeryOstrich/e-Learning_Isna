@@ -5,7 +5,7 @@
 
 define('APP_NAME', 'E-Learning MTs');
 define('APP_VERSION', '1.0.0');
-define('BASE_URL', 'http://localhost/Isnun'); // Sesuaikan dengan domain Anda
+define('BASE_URL', 'http://localhost/WEBSITE-SKRIPSI-ISNA'); // Ganti dengan domain VPS saat deploy
 
 // Token API Fonnte untuk integrasi WhatsApp
 define('FONNTE_TOKEN', 'q2RScQM6ps6n5DXEq5fQ');

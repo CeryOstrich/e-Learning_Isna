@@ -193,9 +193,9 @@ function sendFonnteWhatsApp(string $target, string $message, string $delay = "2"
       CURLOPT_HTTPHEADER => array(
         'Authorization: ' . FONNTE_TOKEN
       ),
-      // Buka proteksi SSL lokal agar berfungsi baik di localhost/Laragon
-      CURLOPT_SSL_VERIFYPEER => false,
-      CURLOPT_SSL_VERIFYHOST => false,
+      // Verifikasi SSL aktif untuk keamanan di server produksi (VPS)
+      CURLOPT_SSL_VERIFYPEER => true,
+      CURLOPT_SSL_VERIFYHOST => 2,
     ));
 
     $response = curl_exec($curl);
