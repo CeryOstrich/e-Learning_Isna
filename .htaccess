@@ -18,10 +18,17 @@ Options -Indexes
     # CATATAN: Jika di VPS root domain, ubah RewriteBase menjadi: /
 
     # Blokir akses langsung ke folder inti
+    # config/ & core/ & views/ → blokir total (tidak ada file yang boleh diakses langsung)
     RewriteRule ^config/ - [F,L]
     RewriteRule ^core/ - [F,L]
-    RewriteRule ^modules/ - [F,L]
     RewriteRule ^views/ - [F,L]
+
+    # modules/ → izinkan akses ke file .php (handler AJAX), tapi blokir directory listing
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_FILENAME} \.php$
+    RewriteRule ^modules/.+\.php$ - [L]
+    RewriteRule ^modules/$ - [F,L]
+    RewriteRule ^modules/[^.]+/?$ - [F,L]
 
     # Jika file/folder asli ada, layani langsung (untuk assets, dll)
     RewriteCond %{REQUEST_FILENAME} !-f
